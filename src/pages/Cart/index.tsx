@@ -91,7 +91,7 @@ export function Cart() {
     setCoffeesInCart((prevCoffees) =>
       prevCoffees.map((coffee) =>
         coffee.id === itemId && coffee.quantity < 5
-          ? { ...coffee, quantity: coffee.quantity + 1 }
+          ? { ...coffee, quantity: coffee.quantity + 1, subTotal: (coffee.quantity+1) *coffee.price }
           : coffee
       )
     );
@@ -101,14 +101,14 @@ export function Cart() {
     setCoffeesInCart((prevCoffees) =>
       prevCoffees.map((coffee) =>
         coffee.id === itemId && coffee.quantity > 1
-          ? { ...coffee, quantity: coffee.quantity - 1 }
+          ? { ...coffee, quantity: coffee.quantity - 1, subTotal: (coffee.quantity-1) *coffee.price }
           : coffee
       )
     );
   }
 
   function handleItemRemove(itemId: string) {
-    setCoffeesInCart((prevCoffes)=>(prevCoffes))
+    setCoffeesInCart((prevCoffes)=>(prevCoffes.filter((coffee)=>(coffee.id!=itemId))))
   }
 
   return (
@@ -146,7 +146,7 @@ export function Cart() {
                   </div>
                 </div>
 
-                <aside>R$ {coffee.subTotal?.toFixed(2)}</aside>
+                <aside>R$ {coffee.subTotal.toFixed(2)}</aside>
               </Coffee>
 
               <span />
@@ -170,7 +170,7 @@ export function Cart() {
                 {new Intl.NumberFormat("pt-br", {
                   currency: "BRL",
                   style: "currency",
-                }).format(DELIVERY_PRICE)}
+                }).format(DELIVERY_PRICE*amountTags.length)}
               </span>
             </div>
 

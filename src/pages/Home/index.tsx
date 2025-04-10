@@ -2,6 +2,7 @@ import { Coffee, Package, ShoppingCart, Timer } from "@phosphor-icons/react";
 import { useTheme } from "styled-components";
 
 import { CoffeeCard } from "../../components/CoffeeCard";
+import { Loading } from "../../components/Loading";
 
 import { CoffeeList, Heading, Hero, HeroContent, Info } from "./styles";
 import { useEffect, useState } from "react";
@@ -19,13 +20,12 @@ interface Coffee {
 }
 export function Home() {
   const [coffees, setCoffees] = useState<Coffee[]>([]);
-
   const theme = useTheme();
 
   useEffect(() => {
     axios({
       method: "get",
-      url: "http://localhost:3000/coffees",
+      url: "http://localhost:3000/coffee",
     }).then((response) => {
       setCoffees(response.data);
     });
@@ -123,22 +123,26 @@ export function Home() {
         <h2>Nossos cafés</h2>
 
         <div>
-          {coffees.map((coffee) => (
-            <CoffeeCard
-              key={coffee.id}
-              coffee={{
-                description: coffee.description,
-                id: coffee.id,
-                image: coffee.image,
-                price: coffee.price,
-                tags: coffee.tags,
-                title: coffee.title,
-                quantity: coffee.quantity,
-              }}
-              incrementQuantity={incrementQuantity}
-              decrementQuantity={decrementQuantity}
-            />
-          ))}
+          {coffees.length === 0 ? (
+            <Loading />
+          ) : (
+            coffees.map((coffee) => (
+              <CoffeeCard
+                key={coffee.id}
+                coffee={{
+                  description: coffee.description,
+                  id: coffee.id,
+                  image: coffee.image,
+                  price: coffee.price,
+                  tags: coffee.tags,
+                  title: coffee.title,
+                  quantity: coffee.quantity,
+                }}
+                incrementQuantity={incrementQuantity}
+                decrementQuantity={decrementQuantity}
+              />
+            ))
+          )}
         </div>
       </CoffeeList>
     </div>
