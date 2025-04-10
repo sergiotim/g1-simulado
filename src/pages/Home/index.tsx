@@ -1,10 +1,12 @@
-import { Coffee, Package, ShoppingCart, Timer } from '@phosphor-icons/react'
-import { useTheme } from 'styled-components'
+import { Coffee, Package, ShoppingCart, Timer } from "@phosphor-icons/react";
+import { useTheme } from "styled-components";
 
-import { CoffeeCard } from '../../components/CoffeeCard'
+import { CoffeeCard } from "../../components/CoffeeCard";
 
-import { CoffeeList, Heading, Hero, HeroContent, Info } from './styles'
-import { useEffect } from 'react';
+import { CoffeeList, Heading, Hero, HeroContent, Info } from "./styles";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { number } from "zod";
 
 interface Coffee {
   id: string;
@@ -14,23 +16,43 @@ interface Coffee {
   price: number;
   image: string;
   quantity: number;
-};
-
+}
 export function Home() {
+  const [coffees, setCoffees] = useState<Coffee[]>([]);
+
   const theme = useTheme();
 
   useEffect(() => {
+    axios({
+      method: "get",
+      url: "http://localhost:3000/coffees",
+    }).then((response) => {
+      setCoffees(response.data);
+    });
     // request para a API para pegar os cafés
     // e setar no estado
   }, []);
 
-
-  
   function incrementQuantity(id: string) {
+    setCoffees((prevCoffees) =>
+      prevCoffees.map((coffee) =>
+        coffee.id === id && coffee.quantity < 5
+          ? { ...coffee, quantity: coffee.quantity + 1 }
+          : coffee
+      )
+    );
+
     // Aqui você pode fazer a lógica para incrementar a quantidade do café
   }
 
   function decrementQuantity(id: string) {
+    setCoffees((prevCoffees) =>
+      prevCoffees.map((coffee) =>
+        coffee.id === id && coffee.quantity > 0
+          ? { ...coffee, quantity: coffee.quantity - 1 }
+          : coffee
+      )
+    );
     // Aqui você pode fazer a lógica para decrementar a quantidade do café
   }
 
@@ -54,7 +76,7 @@ export function Home() {
                   size={32}
                   weight="fill"
                   color={theme.colors.background}
-                  style={{ backgroundColor: theme.colors['yellow-dark'] }}
+                  style={{ backgroundColor: theme.colors["yellow-dark"] }}
                 />
                 <span>Compra simples e segura</span>
               </div>
@@ -64,7 +86,7 @@ export function Home() {
                   size={32}
                   weight="fill"
                   color={theme.colors.background}
-                  style={{ backgroundColor: theme.colors['base-text'] }}
+                  style={{ backgroundColor: theme.colors["base-text"] }}
                 />
                 <span>Embalagem mantém o café intacto</span>
               </div>
@@ -101,22 +123,24 @@ export function Home() {
         <h2>Nossos cafés</h2>
 
         <div>
-        {[1,2,3].map((coffee) => (
-            <CoffeeCard key={coffee} coffee={{
-              description: 'Café expresso tradicional com espuma cremosa',
-              id: '1',
-              image: "/images/coffees/expresso-cremoso.png",
-              price: 9.90,
-              tags: ['Tradicional', 'Comum'],
-              title: 'Expresso Tradicional',
-              quantity: 1,
-            }}
-            incrementQuantity={incrementQuantity}
-            decrementQuantity={decrementQuantity}
+          {coffees.map((coffee) => (
+            <CoffeeCard
+              key={coffee.id}
+              coffee={{
+                description: coffee.description,
+                id: coffee.id,
+                image: coffee.image,
+                price: coffee.price,
+                tags: coffee.tags,
+                title: coffee.title,
+                quantity: coffee.quantity,
+              }}
+              incrementQuantity={incrementQuantity}
+              decrementQuantity={decrementQuantity}
             />
           ))}
         </div>
       </CoffeeList>
     </div>
-  )
+  );
 }
